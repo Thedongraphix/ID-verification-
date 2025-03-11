@@ -1,101 +1,252 @@
-import Image from "next/image";
+'use client'
+
+import React from 'react'
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Paper,
+  Grid,
+  Card,
+  CardContent,
+  CardActions
+} from '@mui/material'
+import { useRouter } from 'next/navigation'
+import { 
+  School,
+  Security,
+  Speed,
+  QrCode
+} from '@mui/icons-material'
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const router = useRouter()
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const features = [
+    {
+      icon: <School sx={{ fontSize: 40 }} />,
+      title: 'Student Management',
+      description: 'Efficiently manage student profiles and academic information'
+    },
+    {
+      icon: <Security sx={{ fontSize: 40 }} />,
+      title: 'Secure ID Cards',
+      description: 'Generate and manage secure student identification cards'
+    },
+    {
+      icon: <Speed sx={{ fontSize: 40 }} />,
+      title: 'Quick Processing',
+      description: 'Fast and automated ID card generation and distribution'
+    },
+    {
+      icon: <QrCode sx={{ fontSize: 40 }} />,
+      title: 'QR Verification',
+      description: 'Easy verification using QR code technology'
+    }
+  ]
+
+  return (
+    <main>
+      {/* Hero Section */}
+      <Box
+        sx={{
+          bgcolor: 'primary.main',
+          color: 'white',
+          py: 8,
+          mb: 6
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h2"
+                component="h1"
+                gutterBottom
+                sx={{ fontWeight: 'bold' }}
+              >
+                KEWI Smart ID Card System
+              </Typography>
+              <Typography variant="h5" paragraph>
+                Streamline your student identification process with our modern and efficient system
+              </Typography>
+              <Box sx={{ mt: 4 }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  onClick={() => router.push('/login')}
+                  sx={{ mr: 2 }}
+                >
+                  Login
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  size="large"
+                  onClick={() => router.push('/register')}
+                >
+                  Register
+                </Button>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 3,
+                  bgcolor: 'background.paper',
+                  borderRadius: 2,
+                  border: '1px solid rgba(0,0,0,0.08)',
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.05)'
+                }}
+              >
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 'auto',
+                    borderRadius: 1,
+                    p: 4,
+                    bgcolor: '#f8fafc',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    border: '1px dashed rgba(0,0,0,0.1)',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/globe.svg"
+                    alt="KEWI ID Card"
+                    sx={{
+                      width: '60%',
+                      height: 'auto',
+                      mb: 4
+                    }}
+                  />
+                  <Typography 
+                    variant="h6" 
+                    color="primary.main" 
+                    sx={{ fontWeight: 600, textAlign: 'center' }}
+                  >
+                    Modern Student ID Card
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ textAlign: 'center', mt: 1 }}
+                  >
+                    Secure • Digital • Easy to verify
+                  </Typography>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* Features Section */}
+      <Container maxWidth="lg" sx={{ mb: 8 }}>
+        <Typography
+          variant="h3"
+          component="h2"
+          align="center"
+          gutterBottom
+          sx={{ mb: 6 }}
+        >
+          Features
+        </Typography>
+        <Grid container spacing={4}>
+          {features.map((feature, index) => (
+            <Grid item xs={12} md={3} key={index}>
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  textAlign: 'center'
+                }}
+              >
+                <CardContent>
+                  <Box sx={{ mb: 2, color: 'primary.main' }}>
+                    {feature.icon}
+                  </Box>
+                  <Typography
+                    gutterBottom
+                    variant="h5"
+                    component="h3"
+                  >
+                    {feature.title}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    {feature.description}
+                  </Typography>
+                </CardContent>
+                <CardActions sx={{ mt: 'auto', justifyContent: 'center' }}>
+                  <Button size="small" color="primary">
+                    Learn More
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+
+      {/* Call to Action Section */}
+      <Box
+        sx={{
+          bgcolor: 'grey.100',
+          py: 8
+        }}
+      >
+        <Container maxWidth="md">
+          <Typography
+            variant="h4"
+            align="center"
+            gutterBottom
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Ready to Get Started?
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            align="center"
+            color="text.secondary"
+            paragraph
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+            Join our modern ID card management system and streamline your student identification process
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 2,
+              mt: 4
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => router.push('/register')}
+            >
+              Sign Up Now
+            </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="large"
+              onClick={() => router.push('/verify')}
+            >
+              Verify ID Card
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+    </main>
+  )
 }
