@@ -2,6 +2,7 @@
 
 import { createTheme } from '@mui/material/styles'
 
+// Space Grotesk is now loaded via Next.js font system
 const theme = createTheme({
   palette: {
     primary: {
@@ -36,34 +37,52 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: 'var(--font-space-grotesk), "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     h1: {
-      fontSize: '2.25rem',
-      fontWeight: 700,
+      fontSize: '2.5rem',
+      fontWeight: 600,
+      letterSpacing: '-0.01em',
     },
     h2: {
-      fontSize: '1.875rem',
-      fontWeight: 700,
+      fontSize: '2rem',
+      fontWeight: 600,
+      letterSpacing: '-0.01em',
     },
     h3: {
-      fontSize: '1.5rem',
-      fontWeight: 600,
+      fontSize: '1.75rem',
+      fontWeight: 500,
+      letterSpacing: '-0.01em',
     },
     h4: {
-      fontSize: '1.25rem',
-      fontWeight: 600,
+      fontSize: '1.5rem',
+      fontWeight: 500,
+      letterSpacing: '-0.01em',
     },
     h5: {
-      fontSize: '1.125rem',
-      fontWeight: 600,
+      fontSize: '1.25rem',
+      fontWeight: 500,
+      letterSpacing: '-0.01em',
     },
     h6: {
+      fontSize: '1.125rem',
+      fontWeight: 500,
+      letterSpacing: '-0.01em',
+    },
+    body1: {
       fontSize: '1rem',
-      fontWeight: 600,
+      letterSpacing: '0.01em',
+    },
+    body2: {
+      fontSize: '0.875rem',
+      letterSpacing: '0.01em',
     },
     button: {
       textTransform: 'none',
       fontWeight: 500,
+      letterSpacing: '0.02em',
+    },
+    caption: {
+      letterSpacing: '0.02em',
     },
   },
   shape: {
