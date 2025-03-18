@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import QRCode from 'qrcode';
 import IdCard from '../models/IdCard';
 import Student from '../models/Student';
 import auth from '../middleware/auth';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Generate a unique card number
 const generateCardNumber = (): string => {

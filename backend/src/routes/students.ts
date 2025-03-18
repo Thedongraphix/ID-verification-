@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import Student from '../models/Student';
 import auth from '../middleware/auth';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({

@@ -1,9 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import auth from '../middleware/auth';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Register a new user
 router.post('/register', async (req: Request, res: Response) => {
