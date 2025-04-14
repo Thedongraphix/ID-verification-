@@ -6,7 +6,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "../theme";
 import Navbar from '../components/Navbar'
-import { AuthProvider } from '@/contexts/AuthContext'
+import { ClerkProvider } from '@clerk/nextjs'
 
 // Configure the Space Grotesk font with Next.js optimization
 const spaceGrotesk = Space_Grotesk({ 
@@ -30,15 +30,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${spaceGrotesk.variable}`}>
       <body className={spaceGrotesk.className}>
-        <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <AuthProvider>
+        <ClerkProvider>
+          <AppRouterCacheProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
               <Navbar />
               {children}
-            </AuthProvider>
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

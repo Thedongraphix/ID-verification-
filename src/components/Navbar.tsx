@@ -16,6 +16,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  ListItemButton,
   Avatar,
   Tooltip,
   useMediaQuery,
@@ -32,14 +33,14 @@ import {
 } from '@mui/icons-material'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { useAuth } from '@/contexts/AuthContext'
+import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const { user, isAuthenticated, logout } = useAuth()
+  const { isSignedIn, user } = useUser()
   
   const [mobileOpen, setMobileOpen] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -56,13 +57,6 @@ export default function Navbar() {
     setAnchorEl(null)
   }
   
-  const handleLogout = () => {
-    logout()
-    router.push('/')
-    handleCloseMenu()
-    setMobileOpen(false)
-  }
-  
   const navigateTo = (path: string) => {
     router.push(path)
     setMobileOpen(false)
@@ -77,8 +71,7 @@ export default function Navbar() {
         </Typography>
       </Box>
       <List>
-        <ListItem 
-          button 
+        <ListItemButton
           onClick={() => navigateTo('/')} 
           selected={pathname === '/'}
           sx={{ 
@@ -98,10 +91,9 @@ export default function Navbar() {
             <QrCode2 />
           </ListItemIcon>
           <ListItemText primary="Home" />
-        </ListItem>
+        </ListItemButton>
         
-        <ListItem 
-          button 
+        <ListItemButton
           onClick={() => navigateTo('/verify')} 
           selected={pathname === '/verify'}
           sx={{ 
@@ -121,12 +113,11 @@ export default function Navbar() {
             <QrCode2 />
           </ListItemIcon>
           <ListItemText primary="Verify ID" />
-        </ListItem>
+        </ListItemButton>
         
-        {isAuthenticated ? (
+        {isSignedIn ? (
           <>
-            <ListItem 
-              button 
+            <ListItemButton
               onClick={() => navigateTo('/dashboard')} 
               selected={pathname === '/dashboard'}
               sx={{ 
@@ -146,31 +137,13 @@ export default function Navbar() {
                 <Dashboard />
               </ListItemIcon>
               <ListItemText primary="Dashboard" />
-            </ListItem>
-            <ListItem 
-              button 
-              onClick={handleLogout} 
-              sx={{ 
-                mx: 1, 
-                borderRadius: 2,
-                color: 'error.main',
-                '& .MuiListItemIcon-root': {
-                  color: 'error.main'
-                }
-              }}
-            >
-              <ListItemIcon>
-                <ExitToApp />
-              </ListItemIcon>
-              <ListItemText primary="Sign Out" />
-            </ListItem>
+            </ListItemButton>
           </>
         ) : (
           <>
-            <ListItem 
-              button 
-              onClick={() => navigateTo('/login')} 
-              selected={pathname === '/login'}
+            <ListItemButton
+              onClick={() => navigateTo('/sign-in')} 
+              selected={pathname === '/sign-in'}
               sx={{ 
                 mx: 1, 
                 borderRadius: 2,
@@ -188,11 +161,10 @@ export default function Navbar() {
                 <Login />
               </ListItemIcon>
               <ListItemText primary="Sign In" />
-            </ListItem>
-            <ListItem 
-              button 
-              onClick={() => navigateTo('/register')} 
-              selected={pathname === '/register'}
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => navigateTo('/sign-up')} 
+              selected={pathname === '/sign-up'}
               sx={{ 
                 mx: 1, 
                 borderRadius: 2,
@@ -210,7 +182,7 @@ export default function Navbar() {
                 <PersonAdd />
               </ListItemIcon>
               <ListItemText primary="Sign Up" />
-            </ListItem>
+            </ListItemButton>
           </>
         )}
       </List>
@@ -250,152 +222,93 @@ export default function Navbar() {
               fontWeight: 700,
               color: 'primary.main',
               cursor: 'pointer',
-              flexGrow: { xs: 1, md: 0 },
-              mr: { md: 4 }
+              flexGrow: 1
             }}
           >
             KEWI ID
           </Typography>
-          
+
           {!isMobile && (
-            <>
-              <Box sx={{ display: 'flex', flexGrow: 1 }}>
-                <Link href="/verify" style={{ textDecoration: 'none' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Button
+                color="inherit"
+                onClick={() => navigateTo('/')}
+                sx={{ 
+                  color: pathname === '/' ? 'primary.main' : 'text.primary',
+                  fontWeight: pathname === '/' ? 600 : 400
+                }}
+              >
+                Home
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => navigateTo('/verify')}
+                sx={{ 
+                  color: pathname === '/verify' ? 'primary.main' : 'text.primary',
+                  fontWeight: pathname === '/verify' ? 600 : 400
+                }}
+              >
+                Verify ID
+              </Button>
+              {isSignedIn ? (
+                <>
                   <Button
                     color="inherit"
+                    onClick={() => navigateTo('/dashboard')}
                     sx={{ 
-                      mx: 1,
-                      fontWeight: pathname === '/verify' ? 600 : 400,
-                      color: pathname === '/verify' ? 'primary.main' : 'inherit'
+                      color: pathname === '/dashboard' ? 'primary.main' : 'text.primary',
+                      fontWeight: pathname === '/dashboard' ? 600 : 400
                     }}
                   >
-                    Verify ID
+                    Dashboard
                   </Button>
-                </Link>
-                
-                {isAuthenticated && (
-                  <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+                  <UserButton afterSignOutUrl="/" />
+                </>
+              ) : (
+                <>
+                  <SignInButton mode="modal">
                     <Button
                       color="inherit"
                       sx={{ 
-                        mx: 1,
-                        fontWeight: pathname === '/dashboard' ? 600 : 400,
-                        color: pathname === '/dashboard' ? 'primary.main' : 'inherit'
+                        color: pathname === '/sign-in' ? 'primary.main' : 'text.primary',
+                        fontWeight: pathname === '/sign-in' ? 600 : 400
                       }}
-                    >
-                      Dashboard
-                    </Button>
-                  </Link>
-                )}
-              </Box>
-              
-              <Box>
-                {isAuthenticated ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      onClick={handleLogout}
-                      startIcon={<ExitToApp />}
-                      sx={{ 
-                        ml: 2,
-                        borderRadius: 8,
-                        fontWeight: 500
-                      }}
-                    >
-                      Sign Out
-                    </Button>
-                    
-                    <Tooltip title="Account">
-                      <IconButton 
-                        onClick={handleMenu} 
-                        sx={{ ml: 2 }}
-                      >
-                        <Avatar 
-                          sx={{ 
-                            width: 40, 
-                            height: 40,
-                            bgcolor: 'primary.main',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          {user?.firstName?.charAt(0) || 'U'}
-                        </Avatar>
-                      </IconButton>
-                    </Tooltip>
-                    
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleCloseMenu}
-                      PaperProps={{
-                        elevation: 2,
-                        sx: { 
-                          mt: 1.5, 
-                          borderRadius: 2,
-                          minWidth: 180
-                        }
-                      }}
-                    >
-                      <MenuItem onClick={() => navigateTo('/id-card')}>
-                        <ListItemIcon>
-                          <QrCode2 fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>View ID Card</ListItemText>
-                      </MenuItem>
-                      <MenuItem onClick={() => navigateTo('/profile')}>
-                        <ListItemIcon>
-                          <Person fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Profile</ListItemText>
-                      </MenuItem>
-                      <MenuItem onClick={handleLogout}>
-                        <ListItemIcon>
-                          <ExitToApp fontSize="small" color="error" />
-                        </ListItemIcon>
-                        <ListItemText sx={{ color: 'error.main' }}>Sign Out</ListItemText>
-                      </MenuItem>
-                    </Menu>
-                  </Box>
-                ) : (
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                      color="inherit"
-                      onClick={() => router.push('/login')}
-                      sx={{ fontWeight: 500 }}
                     >
                       Sign In
                     </Button>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => router.push('/register')}
-                      sx={{ 
-                        borderRadius: 8,
-                        px: 3
-                      }}
-                    >
-                      Sign Up
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-            </>
+                  </SignInButton>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigateTo('/sign-up')}
+                    sx={{ 
+                      fontWeight: 600,
+                      textTransform: 'none'
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </>
+              )}
+            </Box>
           )}
         </Toolbar>
       </Container>
-      
+
       <Drawer
         variant="temporary"
+        anchor="left"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{ keepMounted: true }}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
         sx={{
+          display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': { 
             boxSizing: 'border-box', 
             width: 250,
-            borderTopRightRadius: 16,
-            borderBottomRightRadius: 16,
+            borderRight: 'none',
+            boxShadow: '0 0 20px rgba(0,0,0,0.05)'
           },
         }}
       >

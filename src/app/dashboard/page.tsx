@@ -22,26 +22,34 @@ import {
   Info
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/contexts/AuthContext'
+import { useUser } from "@clerk/nextjs";
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { user, cardInfo, isAuthenticated } = useAuth()
+  const { user, isLoaded, isSignedIn } = useUser()
 
   // Check if user is authenticated
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
+    if (isLoaded && !isSignedIn) {
+      router.push('/sign-in')
     }
-  }, [isAuthenticated, router])
+  }, [isLoaded, isSignedIn, router])
 
   // Handle loading state
-  if (!isAuthenticated || !user || !cardInfo) {
+  if (!isLoaded || !isSignedIn || !user) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     )
+  }
+
+  // Mock card info for now - you can replace this with real data from your backend
+  const cardInfo = {
+    cardNumber: 'KEWI-2024-001',
+    issueDate: '2024-01-01',
+    expiryDate: '2025-01-01',
+    status: 'Active'
   }
 
   return (
@@ -73,7 +81,7 @@ export default function DashboardPage() {
                 boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
               }}
             >
-              {user.firstName.charAt(0)}
+              {user.firstName?.charAt(0) || 'U'}
             </Avatar>
             <Box>
               <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
@@ -88,7 +96,7 @@ export default function DashboardPage() {
                 />
                 <Chip
                   icon={<School />}
-                  label={`Program: ${user.program}`}
+                  label={`Email: ${user.emailAddresses[0]?.emailAddress}`}
                   variant="outlined"
                   sx={{ borderRadius: 2 }}
                 />
@@ -248,27 +256,7 @@ export default function DashboardPage() {
                     }
                   }}
                 >
-                  Report Lost Card
-                </Button>
-                
-                <Button
-                  variant="contained"
-                  fullWidth
-                  size="large"
-                  startIcon={<QrCode2 />}
-                  onClick={() => router.push('/verify')}
-                  sx={{
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    justifyContent: 'flex-start',
-                    py: 1.5,
-                    bgcolor: '#009688',
-                    '&:hover': {
-                      bgcolor: '#00796b'
-                    }
-                  }}
-                >
-                  Verify ID Card
+                  Help & Support
                 </Button>
               </Box>
             </CardContent>
