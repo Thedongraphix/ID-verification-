@@ -33,7 +33,7 @@ import {
 } from '@mui/icons-material'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { UserButton, useUser, SignInButton } from "@clerk/nextjs";
+import { UserButton, useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Navbar() {
   const router = useRouter()
@@ -138,51 +138,56 @@ export default function Navbar() {
               </ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItemButton>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <UserButton afterSignOutUrl="/" />
+            </Box>
           </>
         ) : (
           <>
-            <ListItemButton
-              onClick={() => navigateTo('/sign-in')} 
-              selected={pathname === '/sign-in'}
-              sx={{ 
-                mx: 1, 
-                borderRadius: 2,
-                mb: 0.5,
-                '&.Mui-selected': {
-                  bgcolor: 'primary.light',
-                  color: 'white',
-                  '& .MuiListItemIcon-root': {
-                    color: 'white'
+            <SignInButton mode="modal">
+              <ListItemButton
+                selected={pathname === '/sign-in'}
+                sx={{ 
+                  mx: 1, 
+                  borderRadius: 2,
+                  mb: 0.5,
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.light',
+                    color: 'white',
+                    '& .MuiListItemIcon-root': {
+                      color: 'white'
+                    }
                   }
-                }
-              }}
-            >
-              <ListItemIcon>
-                <Login />
-              </ListItemIcon>
-              <ListItemText primary="Sign In" />
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => navigateTo('/sign-up')} 
-              selected={pathname === '/sign-up'}
-              sx={{ 
-                mx: 1, 
-                borderRadius: 2,
-                mb: 0.5,
-                '&.Mui-selected': {
-                  bgcolor: 'primary.light',
-                  color: 'white',
-                  '& .MuiListItemIcon-root': {
-                    color: 'white'
+                }}
+              >
+                <ListItemIcon>
+                  <Login />
+                </ListItemIcon>
+                <ListItemText primary="Sign In" />
+              </ListItemButton>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <ListItemButton
+                selected={pathname === '/sign-up'}
+                sx={{ 
+                  mx: 1, 
+                  borderRadius: 2,
+                  mb: 0.5,
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.light',
+                    color: 'white',
+                    '& .MuiListItemIcon-root': {
+                      color: 'white'
+                    }
                   }
-                }
-              }}
-            >
-              <ListItemIcon>
-                <PersonAdd />
-              </ListItemIcon>
-              <ListItemText primary="Sign Up" />
-            </ListItemButton>
+                }}
+              >
+                <ListItemIcon>
+                  <PersonAdd />
+                </ListItemIcon>
+                <ListItemText primary="Sign Up" />
+              </ListItemButton>
+            </SignUpButton>
           </>
         )}
       </List>
@@ -262,7 +267,9 @@ export default function Navbar() {
                   >
                     Dashboard
                   </Button>
-                  <UserButton afterSignOutUrl="/" />
+                  <Box sx={{ ml: 1 }}>
+                    <UserButton afterSignOutUrl="/" />
+                  </Box>
                 </>
               ) : (
                 <>
@@ -277,16 +284,17 @@ export default function Navbar() {
                       Sign In
                     </Button>
                   </SignInButton>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigateTo('/sign-up')}
-                    sx={{ 
-                      fontWeight: 600,
-                      textTransform: 'none'
-                    }}
-                  >
-                    Sign Up
-                  </Button>
+                  <SignUpButton mode="modal">
+                    <Button
+                      variant="contained"
+                      sx={{ 
+                        fontWeight: 600,
+                        textTransform: 'none'
+                      }}
+                    >
+                      Sign Up
+                    </Button>
+                  </SignUpButton>
                 </>
               )}
             </Box>

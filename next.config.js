@@ -9,6 +9,19 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  // Allow Clerk's domains for images
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.clerk.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.clerk.accounts.dev',
+      },
+    ],
+  },
   // Explicitly exclude the backend directory
   webpack: (config, { isServer }) => {
     config.externals = [...(config.externals || []), 'backend'];
