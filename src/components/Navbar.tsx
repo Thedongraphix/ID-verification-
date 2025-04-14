@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -9,30 +9,22 @@ import {
   Box,
   Container,
   IconButton,
-  Menu,
-  MenuItem,
-  Drawer,
   List,
-  ListItem,
   ListItemIcon,
   ListItemText,
   ListItemButton,
-  Avatar,
-  Tooltip,
+  Drawer,
   useMediaQuery,
   useTheme
 } from '@mui/material'
 import {
   Menu as MenuIcon,
   Dashboard,
-  Person,
   QrCode2,
-  ExitToApp,
   Login,
   PersonAdd
 } from '@mui/icons-material'
 import { useRouter, usePathname } from 'next/navigation'
-import Link from 'next/link'
 import { UserButton, useUser, SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Navbar() {
@@ -40,151 +32,155 @@ export default function Navbar() {
   const pathname = usePathname()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const { isSignedIn, user } = useUser()
+  const { isSignedIn } = useUser()
   
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  
+  // Fix Clerk modal positioning when it's rendered
+  useEffect(() => {
+    const fixClerkModal = () => {
+      // Find all Clerk popover cards and set their position
+      const clerkPopovers = document.querySelectorAll('.cl-userButtonPopoverCard');
+      clerkPopovers.forEach(popover => {
+        if (popover instanceof HTMLElement) {
+          popover.style.position = 'absolute';
+          popover.style.top = '100%';
+          popover.style.right = '0';
+          popover.style.transform = 'translateY(8px)';
+          popover.style.zIndex = '9999';
+          
+          // For mobile devices
+          if (window.innerWidth < 600) {
+            popover.style.position = 'fixed';
+            popover.style.bottom = '20px';
+            popover.style.left = '20px';
+            popover.style.width = 'calc(100% - 40px)';
+            popover.style.maxWidth = '400px';
+            popover.style.top = 'auto';
+          }
+        }
+      });
+    };
+
+    // Run initially and set an observer for dynamic changes
+    fixClerkModal();
+    
+    // Create MutationObserver to watch for Clerk modal being added to DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length) {
+          const addedNodes = Array.from(mutation.addedNodes);
+          for (const node of addedNodes) {
+            if (node instanceof HTMLElement && 
+                (node.classList.contains('cl-userButtonPopoverCard') || 
+                 node.querySelector('.cl-userButtonPopoverCard'))) {
+              fixClerkModal();
+            }
+          }
+        }
+      });
+    });
+    
+    // Start observing the document body for changes
+    observer.observe(document.body, { 
+      childList: true, 
+      subtree: true 
+    });
+    
+    // Clean up the observer when component unmounts
+    return () => observer.disconnect();
+  }, []);
   
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
   
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  
-  const handleCloseMenu = () => {
-    setAnchorEl(null)
-  }
-  
   const navigateTo = (path: string) => {
     router.push(path)
     setMobileOpen(false)
-    handleCloseMenu()
   }
 
+  // Navigation items
+  const navItems = [
+    { name: 'Home', path: '/', icon: <QrCode2 /> },
+    { name: 'Verify ID', path: '/verify', icon: <QrCode2 /> },
+    ...(isSignedIn ? [{ name: 'Dashboard', path: '/dashboard', icon: <Dashboard /> }] : [])
+  ]
+
+  // Mobile drawer content
   const drawer = (
-    <Box sx={{ width: 250, pt: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main' }}>
-          KEWI ID
-        </Typography>
-      </Box>
+    <Box sx={{ width: 250, pt: 3, px: 2 }}>
+      <Typography variant="h5" sx={{ fontWeight: 700, color: 'primary.main', textAlign: 'center', mb: 3 }}>
+        KEWI ID
+      </Typography>
+
       <List>
-        <ListItemButton
-          onClick={() => navigateTo('/')} 
-          selected={pathname === '/'}
-          sx={{ 
-            mx: 1, 
-            borderRadius: 2,
-            mb: 0.5,
-            '&.Mui-selected': {
-              bgcolor: 'primary.light',
-              color: 'white',
-              '& .MuiListItemIcon-root': {
-                color: 'white'
+        {navItems.map((item) => (
+          <ListItemButton
+            key={item.name}
+            onClick={() => navigateTo(item.path)}
+            selected={pathname === item.path}
+            sx={{ 
+              borderRadius: 2,
+              mb: 1,
+              '&.Mui-selected': {
+                bgcolor: 'primary.light',
+                color: 'white',
+                '& .MuiListItemIcon-root': { color: 'white' }
               }
-            }
-          }}
-        >
-          <ListItemIcon>
-            <QrCode2 />
-          </ListItemIcon>
-          <ListItemText primary="Home" />
-        </ListItemButton>
-        
-        <ListItemButton
-          onClick={() => navigateTo('/verify')} 
-          selected={pathname === '/verify'}
-          sx={{ 
-            mx: 1, 
-            borderRadius: 2,
-            mb: 0.5,
-            '&.Mui-selected': {
-              bgcolor: 'primary.light',
-              color: 'white',
-              '& .MuiListItemIcon-root': {
-                color: 'white'
-              }
-            }
-          }}
-        >
-          <ListItemIcon>
-            <QrCode2 />
-          </ListItemIcon>
-          <ListItemText primary="Verify ID" />
-        </ListItemButton>
+            }}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.name} />
+          </ListItemButton>
+        ))}
         
         {isSignedIn ? (
-          <>
-            <ListItemButton
-              onClick={() => navigateTo('/dashboard')} 
-              selected={pathname === '/dashboard'}
-              sx={{ 
-                mx: 1, 
-                borderRadius: 2,
-                mb: 0.5,
-                '&.Mui-selected': {
-                  bgcolor: 'primary.light',
-                  color: 'white',
-                  '& .MuiListItemIcon-root': {
-                    color: 'white'
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            mt: 3
+          }}>
+            <Box className="clerk-user-wrapper" sx={{ position: 'relative',  }}>
+              <UserButton 
+              
+                afterSignOutUrl="/" 
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: { 
+                      width: '40px', 
+                      height: '40px',
+                      margin: 0,
+                    }
                   }
-                }
-              }}
-            >
-              <ListItemIcon>
-                <Dashboard />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard" />
-            </ListItemButton>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <UserButton afterSignOutUrl="/" />
+                }}
+              />
             </Box>
-          </>
+          </Box>
         ) : (
           <>
             <SignInButton mode="modal">
               <ListItemButton
-                selected={pathname === '/sign-in'}
                 sx={{ 
-                  mx: 1, 
                   borderRadius: 2,
-                  mb: 0.5,
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.light',
-                    color: 'white',
-                    '& .MuiListItemIcon-root': {
-                      color: 'white'
-                    }
-                  }
+                  mb: 1
                 }}
               >
-                <ListItemIcon>
-                  <Login />
-                </ListItemIcon>
+                <ListItemIcon><Login /></ListItemIcon>
                 <ListItemText primary="Sign In" />
               </ListItemButton>
             </SignInButton>
             <SignUpButton mode="modal">
               <ListItemButton
-                selected={pathname === '/sign-up'}
                 sx={{ 
-                  mx: 1, 
                   borderRadius: 2,
-                  mb: 0.5,
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.light',
-                    color: 'white',
-                    '& .MuiListItemIcon-root': {
-                      color: 'white'
-                    }
-                  }
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  '&:hover': { bgcolor: 'primary.dark' },
+                  '& .MuiListItemIcon-root': { color: 'white' }
                 }}
               >
-                <ListItemIcon>
-                  <PersonAdd />
-                </ListItemIcon>
+                <ListItemIcon><PersonAdd /></ListItemIcon>
                 <ListItemText primary="Sign Up" />
               </ListItemButton>
             </SignUpButton>
@@ -233,53 +229,43 @@ export default function Navbar() {
             KEWI ID
           </Typography>
 
+          {/* Desktop navigation */}
           {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-              <Button
-                color="inherit"
-                onClick={() => navigateTo('/')}
-                sx={{ 
-                  color: pathname === '/' ? 'primary.main' : 'text.primary',
-                  fontWeight: pathname === '/' ? 600 : 400
-                }}
-              >
-                Home
-              </Button>
-              <Button
-                color="inherit"
-                onClick={() => navigateTo('/verify')}
-                sx={{ 
-                  color: pathname === '/verify' ? 'primary.main' : 'text.primary',
-                  fontWeight: pathname === '/verify' ? 600 : 400
-                }}
-              >
-                Verify ID
-              </Button>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {navItems.map((item) => (
+                <Button
+                  key={item.name}
+                  color="inherit"
+                  onClick={() => navigateTo(item.path)}
+                  sx={{ 
+                    color: pathname === item.path ? 'primary.main' : 'text.primary',
+                    fontWeight: pathname === item.path ? 600 : 400
+                  }}
+                >
+                  {item.name}
+                </Button>
+              ))}
+              
               {isSignedIn ? (
-                <>
-                  <Button
-                    color="inherit"
-                    onClick={() => navigateTo('/dashboard')}
-                    sx={{ 
-                      color: pathname === '/dashboard' ? 'primary.main' : 'text.primary',
-                      fontWeight: pathname === '/dashboard' ? 600 : 400
+                <Box className="clerk-user-wrapper" sx={{ position: 'relative', ml: 2 }}>
+                  <UserButton 
+                    afterSignOutUrl="/" 
+                    appearance={{
+                      elements: {
+                        userButtonAvatarBox: { 
+                          width: '40px', 
+                          height: '40px' 
+                        }
+                      }
                     }}
-                  >
-                    Dashboard
-                  </Button>
-                  <Box sx={{ ml: 1 }}>
-                    <UserButton afterSignOutUrl="/" />
-                  </Box>
-                </>
+                  />
+                </Box>
               ) : (
                 <>
                   <SignInButton mode="modal">
                     <Button
                       color="inherit"
-                      sx={{ 
-                        color: pathname === '/sign-in' ? 'primary.main' : 'text.primary',
-                        fontWeight: pathname === '/sign-in' ? 600 : 400
-                      }}
+                      sx={{ fontWeight: 500 }}
                     >
                       Sign In
                     </Button>
@@ -287,10 +273,7 @@ export default function Navbar() {
                   <SignUpButton mode="modal">
                     <Button
                       variant="contained"
-                      sx={{ 
-                        fontWeight: 600,
-                        textTransform: 'none'
-                      }}
+                      sx={{ fontWeight: 600, textTransform: 'none' }}
                     >
                       Sign Up
                     </Button>
@@ -307,9 +290,7 @@ export default function Navbar() {
         anchor="left"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
+        ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': { 
@@ -324,4 +305,4 @@ export default function Navbar() {
       </Drawer>
     </AppBar>
   )
-} 
+}

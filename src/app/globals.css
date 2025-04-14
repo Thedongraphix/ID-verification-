@@ -58,7 +58,7 @@ body {
 
 /* Minimal Clerk positioning CSS */
 .cl-rootBox {
-  margin-top: 80px; /* Add space below navbar */
+  margin-top: 0px; /* Add space below navbar */
   display: flex;
   justify-content: center;
 }
@@ -69,4 +69,43 @@ body {
   margin-left: auto;
   margin-right: auto;
   max-width: 450px;
+}
+
+/* Clerk modal styles */
+.cl-modalBackdrop {
+  z-index: 1300; /* Ensure it's above MUI components */
+}
+
+.cl-modalContent {
+  border-radius: 12px;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Clerk UserButton customization */
+.cl-userButtonBox {
+  outline: none !important;
+}
+
+.cl-userButtonAvatarBox {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+/* Position the UserButton dropdown properly */
+.cl-userButtonPopoverCard {
+  z-index: 1400 !important; /* Higher z-index than navbar */
+  margin-top: 8px !important;
+}
+
+/* Don't cut off dropdown items */
+.cl-userButtonPopoverActions {
+  overflow: visible !important;
+}
+
+/* Fix positioning of user dropdown */
+.cl-userButtonPopoverCard.cl-userButtonPopoverCard__bottomRight,
+.cl-userButtonPopoverCard.cl-userButtonPopoverCard__bottomLeft {
+  top: 100% !important;
+  transform: translateY(10px) !important;
 }
