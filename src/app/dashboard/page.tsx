@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Container,
   Grid,
@@ -27,21 +27,30 @@ import { useUser } from "@clerk/nextjs";
 export default function DashboardPage() {
   const router = useRouter()
   const { user, isLoaded, isSignedIn } = useUser()
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
 
   // Check if user is authenticated
   useEffect(() => {
-    if (isLoaded && !isSignedIn) {
-      router.push('/sign-in')
+    if (isLoaded) {
+      setIsInitialLoading(false)
+      if (!isSignedIn) {
+        router.push('/sign-in')
+      }
     }
   }, [isLoaded, isSignedIn, router])
 
   // Handle loading state
-  if (!isLoaded || !isSignedIn || !user) {
+  if (isInitialLoading || !isLoaded) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     )
+  }
+
+  // User not signed in, this should redirect but we'll return empty in case redirect hasn't happened yet
+  if (!isSignedIn || !user) {
+    return null
   }
 
   // Mock card info for now - you can replace this with real data from your backend
@@ -85,7 +94,7 @@ export default function DashboardPage() {
             </Avatar>
             <Box>
               <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                Welcome, {user.firstName} {user.lastName}
+                Welcome, {user.firstName || ''} {user.lastName || ''}
               </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
                 <Chip
@@ -96,7 +105,7 @@ export default function DashboardPage() {
                 />
                 <Chip
                   icon={<School />}
-                  label={`Email: ${user.emailAddresses[0]?.emailAddress}`}
+                  label={`Email: ${user.emailAddresses[0]?.emailAddress || 'No email'}`}
                   variant="outlined"
                   sx={{ borderRadius: 2 }}
                 />
